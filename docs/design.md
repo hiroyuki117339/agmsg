@@ -136,7 +136,6 @@ must track the same resolved project); direct shell invocations and
 | `team.sh` | List team members |
 | `whoami.sh` | Identify agent by project path and type |
 | `rename.sh` | Rename agent in config and message history |
-| `hook.sh` | Enable/disable Stop hook (on/off) |
 | `check-inbox.sh` | Hook entry point — cooldown, check, notify |
 | `config.sh` | Read/write user config (YAML) |
 

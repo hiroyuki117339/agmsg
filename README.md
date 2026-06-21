@@ -309,8 +309,6 @@ See [docs/opencode.md](docs/opencode.md) for full setup instructions.
 
 `send.sh` takes exactly four positional arguments: `<team> <from> <to> "<message>"`. Quote the message so the shell sees it as one argument; an unquoted message with spaces will be misparsed.
 
-`hook.sh on|off` still works as a legacy alias for `delivery.sh set turn|off` but prints a deprecation notice.
-
 ## FAQ / Design notes
 
 **Is this MCP? Do I need an MCP server?**

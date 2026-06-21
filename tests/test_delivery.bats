@@ -172,21 +172,6 @@ settings_file() {
   [[ "$output" =~ "mode: off" ]]
 }
 
-# --- hook.sh backward compat ---
-
-@test "hook.sh on delegates to delivery set turn" {
-  bash "$SCRIPTS/hook.sh" on claude-code "$TEST_PROJECT" 2>&1
-  has_check_inbox "$(settings_file)"
-  ! has_session_start "$(settings_file)"
-}
-
-@test "hook.sh off delegates to delivery set off" {
-  bash "$SCRIPTS/hook.sh" on  claude-code "$TEST_PROJECT" 2>&1
-  bash "$SCRIPTS/hook.sh" off claude-code "$TEST_PROJECT" 2>&1
-  ! has_check_inbox "$(settings_file)"
-  ! has_session_start "$(settings_file)"
-}
-
 # --- rejects unknown mode ---
 
 @test "delivery set: rejects unknown mode" {
@@ -464,22 +449,6 @@ JSON
   echo '{"session_id":"x"}' | bash "$SCRIPTS/session-start.sh" claude-code "$TEST_PROJECT" >/dev/null
   [ -f "$TEST_SKILL_DIR/run/watch.live-session.pid" ]
   kill "$alive_pid" 2>/dev/null || true
-}
-
-# --- hook.sh deprecation notice ---
-
-@test "hook.sh on prints a deprecation notice on stderr" {
-  run bash "$SCRIPTS/hook.sh" on claude-code "$TEST_PROJECT"
-  [ "$status" -eq 0 ]
-  # Combined stderr+stdout is captured by `run` — assert the notice appears.
-  [[ "$output" =~ "deprecated" ]]
-}
-
-@test "hook.sh off prints a deprecation notice on stderr" {
-  bash "$SCRIPTS/hook.sh" on claude-code "$TEST_PROJECT" >/dev/null
-  run bash "$SCRIPTS/hook.sh" off claude-code "$TEST_PROJECT"
-  [ "$status" -eq 0 ]
-  [[ "$output" =~ "deprecated" ]]
 }
 
 # --- emit_monitor_directive idempotency ---

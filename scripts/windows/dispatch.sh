@@ -69,7 +69,7 @@ fi
 run_script() {
   local script="$1"
   shift
-  bash "$SCRIPT_DIR/$script" "$@"
+  bash "$SCRIPT_DIR/../$script" "$@"
 }
 
 require_args() {

@@ -346,7 +346,7 @@ printf '%s\n' "$INSTALLED_VERSION" > "$SKILL_DIR/VERSION"
 
 # Initialize DB
 if [ ! -f "$SKILL_DIR/db/messages.db" ]; then
-  bash "$SKILL_DIR/scripts/init-db.sh"
+  bash "$SKILL_DIR/scripts/internal/init-db.sh"
 fi
 
 # Initialize config

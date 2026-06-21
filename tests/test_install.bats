@@ -199,7 +199,7 @@ wait_for_pidfile_pid() {
   [ ! -f "$FAKE_HOME/.agents/bin/sqlite3" ]
   [ -f "$FAKE_HOME/.agents/skills/msg/scripts/windows/agmsg.ps1" ]
   [ -f "$FAKE_HOME/.agents/skills/msg/scripts/windows/install-agmsg.ps1" ]
-  [ -f "$FAKE_HOME/.agents/skills/msg/scripts/dispatch.sh" ]
+  [ -f "$FAKE_HOME/.agents/skills/msg/scripts/windows/dispatch.sh" ]
 }
 
 @test "install --update: removes legacy Windows runner and sqlite shim" {
@@ -234,7 +234,7 @@ PS1
 
   [ -f "$SK/scripts/windows/agmsg.ps1" ]
   [ -f "$SK/scripts/windows/install-agmsg.ps1" ]
-  [ -f "$SK/scripts/dispatch.sh" ]
+  [ -f "$SK/scripts/windows/dispatch.sh" ]
   [ ! -f "$SK/scripts/windows/agmsg-run.sh" ]
   [ ! -f "$SK/scripts/windows/sqlite3-shim.sh" ]
 }
