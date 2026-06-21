@@ -94,15 +94,16 @@ windows_wrap() {
 
 # Append a single entry of the form {"matcher":"","hooks":[{"type":"command","command":"<cmd>"}]}
 # to .hooks.<event> in the JSON at <path>, creating arrays/objects as needed.
-# For Codex agents (pass "codex" as the 4th arg) the entry also carries a
-# "commandWindows" so the hook runs on native Windows; other agent types are
-# unchanged. Writes the result back to <path>. As with strip_agmsg_event_file,
-# the settings are read via readfile() rather than via argv (#95).
+# When the 4th arg is "yes" the entry also carries a "commandWindows" so the hook
+# runs on native Windows; otherwise it is omitted. This layer stays type-agnostic
+# — the caller (delivery.sh) decides from the type manifest whether to wrap.
+# Writes the result back to <path>. As with strip_agmsg_event_file, the settings
+# are read via readfile() rather than via argv (#95).
 add_event_entry_file() {
   local path="$1"
   local event="$2"
   local cmd="$3"
-  local hook_type="${4:-}"
+  local windows_wrap="${4:-}"
   local sql_path
   sql_path=$(sql_readfile_path "$path")
 
@@ -115,7 +116,7 @@ add_event_entry_file() {
   local cmd_lit
   cmd_lit=$(printf '%s' "$cmd" | sed "s/'/''/g")
   local hook_obj="json_object('type','command','command','$cmd_lit'"
-  if [ "$hook_type" = "codex" ]; then
+  if [ "$windows_wrap" = "yes" ]; then
     local cw cw_lit
     cw=$(windows_wrap "$cmd")
     cw_lit=$(printf '%s' "$cw" | sed "s/'/''/g")
