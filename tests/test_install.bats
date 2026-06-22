@@ -508,3 +508,33 @@ PY
   [ -f "$FAKE_HOME/.hermes/skills/agmsg/SKILL.md" ]
   grep -q "whoami.sh \"\$(pwd)\" hermes" "$FAKE_HOME/.hermes/skills/agmsg/SKILL.md"
 }
+
+@test "install: --update re-points an existing Codex monitor shim to the new path" {
+  HOME="$FAKE_HOME" bash "$REPO_ROOT/install.sh" --cmd agmsg
+  # Install the shim the way enabling Codex monitor mode would.
+  HOME="$FAKE_HOME" bash "$SK/scripts/drivers/types/codex/codex-shim-install.sh" install >/dev/null
+  local shim="$FAKE_HOME/.agents/bin/codex"
+  [ -f "$shim" ]
+  grep -q '/scripts/drivers/types/codex/codex-shim.sh' "$shim"
+
+  # Simulate a shim baked by a pre-1.1.0 layout (stale exec path), keeping the
+  # agmsg marker so it is still recognized as ours.
+  local tmp; tmp="$(mktemp)"
+  sed 's#/scripts/drivers/types/codex/#/scripts/codex/#g' "$shim" > "$tmp"
+  mv "$tmp" "$shim"
+  grep -q '/scripts/codex/codex-shim.sh' "$shim"
+  ! grep -q '/scripts/drivers/types/codex/codex-shim.sh' "$shim"
+
+  # --update must regenerate it back to the post-move path.
+  HOME="$FAKE_HOME" bash "$REPO_ROOT/install.sh" --update
+  grep -q '/scripts/drivers/types/codex/codex-shim.sh' "$shim"
+  ! grep -q '/scripts/codex/codex-shim.sh' "$shim"
+}
+
+@test "install: --update does NOT create a Codex shim when none was installed" {
+  HOME="$FAKE_HOME" bash "$REPO_ROOT/install.sh" --cmd agmsg
+  [ ! -e "$FAKE_HOME/.agents/bin/codex" ]
+  HOME="$FAKE_HOME" bash "$REPO_ROOT/install.sh" --update
+  # The refresh is gated on an existing agmsg shim — it must not opt the user in.
+  [ ! -e "$FAKE_HOME/.agents/bin/codex" ]
+}

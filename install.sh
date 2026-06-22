@@ -292,6 +292,17 @@ if [ "$UPDATE_ONLY" = true ]; then
   cp "$SCRIPT_DIR/openai.yaml" "$SKILL_DIR/agents/openai.yaml" 2>/dev/null || true
   chmod +x "$SKILL_DIR/scripts/"*.sh
   chmod +x "$SKILL_DIR/scripts/drivers/types/codex/"*.sh 2>/dev/null || true
+  # Refresh the Codex monitor shim (~/.agents/bin/codex) if it's ours. --update
+  # cp's the new codex-shim-install.sh but does not re-run it, so a shim from an
+  # older install keeps its stale baked exec path after the
+  # types/ -> scripts/drivers/types/ move. Re-running install regenerates it with
+  # the new path; install is idempotent and overwrites only an agmsg shim (a
+  # user's own codex binary fails is_agmsg_shim and is left untouched).
+  CODEX_SHIM="$SKILL_DIR/scripts/drivers/types/codex/codex-shim-install.sh"
+  if [ -x "$CODEX_SHIM" ] && AGMSG_CODEX_SHIM_INSTALL_QUIET=1 "$CODEX_SHIM" status 2>/dev/null | grep -q '^installed:'; then
+    AGMSG_CODEX_SHIM_INSTALL_QUIET=1 "$CODEX_SHIM" install >/dev/null 2>&1 \
+      && echo "  + refreshed Codex monitor shim (~/.agents/bin/codex)"
+  fi
   install_windows_helpers
   INSTALLED_VERSION="$(agmsg_source_version)"
   printf '%s\n' "$INSTALLED_VERSION" > "$SKILL_DIR/VERSION"
@@ -345,6 +356,13 @@ cp "$SCRIPT_DIR/plugins/README.md" "$SKILL_DIR/plugins/README.md" 2>/dev/null ||
 cp "$SCRIPT_DIR/openai.yaml" "$SKILL_DIR/agents/openai.yaml" 2>/dev/null || true
 chmod +x "$SKILL_DIR/scripts/"*.sh
 chmod +x "$SKILL_DIR/scripts/drivers/types/codex/"*.sh 2>/dev/null || true
+# Re-point an existing Codex monitor shim at the new path on a reinstall over an
+# older layout (no-op when no agmsg shim is present). See the --update block above.
+CODEX_SHIM="$SKILL_DIR/scripts/drivers/types/codex/codex-shim-install.sh"
+if [ -x "$CODEX_SHIM" ] && AGMSG_CODEX_SHIM_INSTALL_QUIET=1 "$CODEX_SHIM" status 2>/dev/null | grep -q '^installed:'; then
+  AGMSG_CODEX_SHIM_INSTALL_QUIET=1 "$CODEX_SHIM" install >/dev/null 2>&1 \
+    && echo "  + refreshed Codex monitor shim (~/.agents/bin/codex)"
+fi
 install_windows_helpers
 
 # Marker file for uninstall detection
